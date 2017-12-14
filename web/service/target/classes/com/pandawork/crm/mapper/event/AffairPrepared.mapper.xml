@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pandawork.crm.mapper.event.AffairPreparedMapper">
+
+    <select id="listAllRejectedByPage" resultMap="pw.Event">
+        SELECT
+        event.`created_time` AS createdTime ,
+        event.`approval_status` AS approvalStatus,
+        event.`name` AS name
+        FROM `t_event` event
+        WHERE `approval_status` = 3 AND `is_logout` = 0 AND `created_party_id` = #{createdPartyId}
+        ORDER BY id DESC
+        <if test="offset >= 0 and pageSize > 0 ">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="listAllToApprovalByPage" resultMap="pw.Event">
+        SELECT
+        t_event.`created_time` AS createdTime ,
+        t_event.`approval_status` AS approvalStatus,
+        t_event.`name` AS name
+        FROM `t_event`
+        <where>
+            t_event.`approval_status` = 1 AND
+            t_event.`is_logout` = 0 AND
+            t_event.`approval_id` = #{approvalId}
+        </where>
+        ORDER BY id DESC
+        <if test="offset >= 0 and pageSize > 0 ">
+            LIMIT #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countRejected" resultType="int">
+        SELECT COUNT(0)
+        FROM `t_event` event
+        WHERE `approval_status` = 3 AND `is_logout` = 0 AND `created_party_id` = #{createdPartyId}
+    </select>
+
+    <select id="countToApproval" resultType="int">
+        SELECT COUNT(0)
+        FROM `t_event`
+        WHERE t_event.`approval_status` = 1 AND
+        t_event.`is_logout` = 0 AND
+        t_event.`approval_id` = #{approvalId}
+    </select>
+</mapper>
